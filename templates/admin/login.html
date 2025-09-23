@@ -1,0 +1,68 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}登录 - 博客管理{% endblock %}
+
+{% block extra_css %}
+    <style>
+        .login-container {
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+        }
+        .login-card {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.95);
+        }
+        .input-focus:focus {
+            border-color: #4F46E5 !important;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="login-container min-h-screen flex items-center justify-center p-4">
+        <div class="login-card w-full max-w-md rounded-xl shadow-xl overflow-hidden">
+            <!-- 登录头部 -->
+            <div class="bg-primary p-6 text-center">
+                <div class="w-16 h-16 bg-white text-primary rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fa fa-lock text-2xl"></i>
+                </div>
+                <h1 class="text-white text-2xl font-bold">博客管理系统</h1>
+                <p class="text-white/80 text-sm mt-1">请输入您的账号信息</p>
+            </div>
+
+            <!-- 登录表单 -->
+            <div class="p-6">
+                <form method="POST" class="space-y-4">
+                    {{ form.hidden_tag() }}
+                    
+                    <div>
+                        <label for="username" class="block text-sm font-medium text-gray-700 mb-1">用户名</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                <i class="fa fa-user"></i>
+                            </div>
+                            {{ form.username(class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg input-focus transition-custom", placeholder="请输入用户名") }}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="password" class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                                <i class="fa fa-lock"></i>
+                            </div>
+                            {{ form.password(class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg input-focus transition-custom", placeholder="请输入密码") }}
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <button type="submit" class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-primary/90 transition-custom font-medium flex items-center justify-center gap-2">
+                            <i class="fa fa-sign-in"></i>
+                            登录
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

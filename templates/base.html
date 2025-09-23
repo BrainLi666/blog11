@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}我的个人博客{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 自定义配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // 主色调：深紫色
+                        secondary: '#7C3AED', // 次要色调：紫色
+                        accent: '#EC4899', // 强调色：粉色
+                        dark: '#1F2937', // 深色
+                        light: '#F9FAFB', // 浅色
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        serif: ['Merriweather', 'Georgia', 'serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-light text-dark min-h-screen flex flex-col">
+    <!-- 导航栏 -->
+    {% block navbar %}
+    <header class="bg-white shadow-sm sticky top-0 z-50 transition-custom">
+        <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+            <a href="{{ url_for('index') }}" class="text-2xl font-bold text-primary flex items-center gap-2">
+                <i class="fa fa-pencil-square-o"></i>
+                <span>我的博客</span>
+            </a>
+            <nav class="hidden md:flex items-center gap-6">
+                <a href="{{ url_for('index') }}" class="font-medium hover:text-primary transition-custom">首页</a>
+                {% if categories %}
+                    {% for category in categories %}
+                        <a href="{{ url_for('category_posts', category=category) }}" class="font-medium hover:text-primary transition-custom">{{ category }}</a>
+                    {% endfor %}
+                {% endif %}
+                <a href="{{ url_for('login') }}" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-custom">
+                    管理
+                </a>
+            </nav>
+            <button class="md:hidden text-dark text-xl" id="mobile-menu-button">
+                <i class="fa fa-bars"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="md:hidden hidden bg-white border-t" id="mobile-menu">
+            <div class="container mx-auto px-4 py-3 flex flex-col gap-3">
+                <a href="{{ url_for('index') }}" class="font-medium hover:text-primary py-2 transition-custom">首页</a>
+                {% if categories %}
+                    {% for category in categories %}
+                        <a href="{{ url_for('category_posts', category=category) }}" class="font-medium hover:text-primary py-2 transition-custom">{{ category }}</a>
+                    {% endfor %}
+                {% endif %}
+                <a href="{{ url_for('login') }}" class="px-4 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-custom text-center">
+                    管理
+                </a>
+            </div>
+        </div>
+    </header>
+    {% endblock %}
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+        <!-- 消息提示 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-6 p-4 rounded-lg shadow-md {{ 'bg-green-50 text-green-700' if category == 'success' else 'bg-red-50 text-red-700' if category == 'danger' else 'bg-blue-50 text-blue-700' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 页脚 -->
+    {% block footer %}
+    <footer class="bg-dark text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                        <i class="fa fa-pencil-square-o"></i>
+                        我的博客
+                    </h3>
+                    <p class="text-gray-400">分享生活、技术和思考的个人空间。</p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">快速链接</h3>
+                    <ul class="space-y-2 text-gray-400">
+                        <li><a href="{{ url_for('index') }}" class="hover:text-white transition-custom">首页</a></li>
+                        {% if categories %}
+                            {% for category in categories[:3] %}
+                                <li><a href="{{ url_for('category_posts', category=category) }}" class="hover:text-white transition-custom">{{ category }}</a></li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold mb-4">联系我</h3>
+                    <div class="flex gap-4 text-xl">
+                        <a href="#" class="text-gray-400 hover:text-white transition-custom"><i class="fa fa-github"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-custom"><i class="fa fa-twitter"></i></a>
+                        <a href="#" class="text-gray-400 hover:text-white transition-custom"><i class="fa fa-linkedin"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-500">
+                <p>&copy; {{ current_year }} 我的个人博客. 保留所有权利.</p>
+            </div>
+        </div>
+    </footer>
+    {% endblock %}
+
+    <!-- JavaScript -->
+    <script>
+        // 移动端菜单切换
+        document.getElementById('mobile-menu-button')?.addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // 滚动时导航栏样式变化
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('header');
+            if (window.scrollY > 50) {
+                header.classList.add('py-2', 'bg-white/95', 'backdrop-blur-sm', 'shadow');
+                header.classList.remove('py-4');
+            } else {
+                header.classList.add('py-4');
+                header.classList.remove('py-2', 'bg-white/95', 'backdrop-blur-sm', 'shadow');
+            }
+        });
+
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

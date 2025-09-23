@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}博客管理{% endblock %}</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- 自定义配置 -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5', // 主色调：深紫色
+                        secondary: '#7C3AED', // 次要色调：紫色
+                        accent: '#EC4899', // 强调色：粉色
+                        dark: '#1F2937', // 深色
+                        light: '#F9FAFB', // 浅色
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .transition-custom {
+                transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-900 min-h-screen flex flex-col">
+    <!-- 顶部导航 -->
+    {% if current_user.is_authenticated %}
+        <header class="bg-white shadow-sm sticky top-0 z-50">
+            <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+                <a href="{{ url_for('admin.dashboard') }}" class="text-xl font-bold text-primary flex items-center gap-2">
+                    <i class="fa fa-tachometer"></i>
+                    <span>博客管理</span>
+                </a>
+                <div class="flex items-center gap-4">
+                    <div class="hidden md:flex items-center gap-2">
+                        <img 
+                            src="https://picsum.photos/id/{{ current_user.id + 50 }}/100/100" 
+                            alt="{{ current_user.username }}"
+                            class="w-8 h-8 rounded-full object-cover"
+                        >
+                        <span class="text-sm">{{ current_user.username }}</span>
+                    </div>
+                    <a href="{{ url_for('admin.logout') }}" class="text-gray-500 hover:text-primary transition-custom">
+                        <i class="fa fa-sign-out"></i>
+                        <span class="hidden md:inline ml-1">退出</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+    {% endif %}
+
+    <!-- 主内容区 -->
+    <main class="flex-grow container mx-auto px-4 py-6">
+        <!-- 消息提示 -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-6 p-4 rounded-lg shadow-md {{ 'bg-green-50 text-green-700' if category == 'success' else 'bg-red-50 text-red-700' if category == 'danger' else 'bg-blue-50 text-blue-700' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- 页脚 -->
+    <footer class="bg-white border-t mt-8 py-4">
+        <div class="container mx-auto px-4 text-center text-sm text-gray-500">
+            <p>&copy; {{ current_year }} 博客管理系统</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        // 确认对话框
+        function confirmDelete(message) {
+            return confirm(message || '确定要删除吗？');
+        }
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

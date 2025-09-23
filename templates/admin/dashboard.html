@@ -1,0 +1,145 @@
+{% extends 'admin/base.html' %}
+
+{% block title %}仪表盘 - 博客管理{% endblock %}
+
+{% block content %}
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">文章管理</h1>
+                <p class="text-gray-500 mt-1">管理您的所有博客文章</p>
+            </div>
+            <a href="{{ url_for('admin.new_post') }}" class="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom flex items-center gap-2 w-fit">
+                <i class="fa fa-plus"></i>
+                新建文章
+            </a>
+        </div>
+
+        <!-- 统计信息 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center">
+                        <i class="fa fa-file-text-o"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-blue-600">总文章数</p>
+                        <p class="text-2xl font-bold text-blue-800">{{ posts|length }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center">
+                        <i class="fa fa-calendar"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-green-600">本月发布</p>
+                        <p class="text-2xl font-bold text-green-800">
+                            {{ posts|selectattr('created_at', '>', now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))|list|length }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-purple-500/10 text-purple-500 rounded-full flex items-center justify-center">
+                        <i class="fa fa-comment-o"></i>
+                    </div>
+                    <div>
+                        <p class="text-sm text-purple-600">总评论数</p>
+                        <p class="text-2xl font-bold text-purple-800">
+                            {{ posts|sum(attribute='comments|length', start=0) }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 文章列表 -->
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead>
+                    <tr>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            标题
+                        </th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            分类
+                        </th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            作者
+                        </th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            创建时间
+                        </th>
+                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            评论数
+                        </th>
+                        <th class="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            操作
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for post in posts %}
+                        <tr class="hover:bg-gray-50 transition-custom">
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="font-medium text-gray-900 line-clamp-1">
+                                    <a href="{{ url_for('post_detail', slug=post.slug) }}" target="_blank" class="hover:text-primary">
+                                        {{ post.title }}
+                                    </a>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary">
+                                    {{ post.category or '未分类' }}
+                                </span>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap">
+                                <div class="flex items-center">
+                                    <img 
+                                        src="https://picsum.photos/id/{{ post.author_id + 50 }}/100/100" 
+                                        alt="{{ post.author.username }}"
+                                        class="w-6 h-6 rounded-full mr-2"
+                                    >
+                                    <span class="text-sm text-gray-700">{{ post.author.username }}</span>
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                {{ post.created_at.strftime('%Y-%m-%d') }}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
+                                {{ post.comments|length }}
+                            </td>
+                            <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ url_for('admin.edit_post', post_id=post.id) }}" class="text-blue-600 hover:text-blue-800 transition-custom">
+                                        <i class="fa fa-pencil"></i> 编辑
+                                    </a>
+                                    <form method="POST" action="{{ url_for('admin.delete_post', post_id=post.id) }}" onsubmit="return confirmDelete('确定要删除这篇文章吗？删除后将无法恢复。')">
+                                        <button type="submit" class="text-red-600 hover:text-red-800 transition-custom">
+                                            <i class="fa fa-trash"></i> 删除
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 text-gray-400 rounded-full mb-4">
+                                    <i class="fa fa-file-text-o text-2xl"></i>
+                                </div>
+                                <p>暂无文章</p>
+                                <a href="{{ url_for('admin.new_post') }}" class="inline-block mt-2 text-primary hover:underline">
+                                    立即创建第一篇文章
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
