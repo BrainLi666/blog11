@@ -44,7 +44,7 @@
     {% if current_user.is_authenticated %}
         <header class="bg-white shadow-sm sticky top-0 z-50">
             <div class="container mx-auto px-4 py-3 flex justify-between items-center">
-                <a href="{{ url_for('admin.dashboard') }}" class="text-xl font-bold text-primary flex items-center gap-2">
+                <a href="{{ url_for('admin_dashboard') }}" class="text-xl font-bold text-primary flex items-center gap-2">
                     <i class="fa fa-tachometer"></i>
                     <span>博客管理</span>
                 </a>
@@ -57,7 +57,7 @@
                         >
                         <span class="text-sm">{{ current_user.username }}</span>
                     </div>
-                    <a href="{{ url_for('admin.logout') }}" class="text-gray-500 hover:text-primary transition-custom">
+                    <a href="{{ url_for('logout') }}" class="text-gray-500 hover:text-primary transition-custom">
                         <i class="fa fa-sign-out"></i>
                         <span class="hidden md:inline ml-1">退出</span>
                     </a>

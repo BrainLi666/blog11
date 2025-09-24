@@ -4,142 +4,202 @@
 
 {% block content %}
     <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
-        <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">文章管理</h1>
-                <p class="text-gray-500 mt-1">管理您的所有博客文章</p>
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">博客统计概览</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-6">
+            <!-- 总文章数卡片 -->
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-5 rounded-lg shadow-sm border border-blue-200">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-blue-800 font-medium">总文章数</h3>
+                    <span class="text-blue-600">📝</span>
+                </div>
+                <p class="text-3xl font-bold text-blue-900">{{ total_posts }}</p>
+                <p class="text-blue-600 text-sm mt-1">包含所有已发布和草稿文章</p>
             </div>
-            <a href="{{ url_for('admin.new_post') }}" class="mt-4 md:mt-0 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom flex items-center gap-2 w-fit">
-                <i class="fa fa-plus"></i>
+
+            <!-- 本月发布卡片 -->
+            <div class="bg-gradient-to-br from-purple-50 to-purple-100 p-5 rounded-lg shadow-sm border border-purple-200">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-purple-800 font-medium">本月发布</h3>
+                    <span class="text-purple-600">🆕</span>
+                </div>
+                <p class="text-3xl font-bold text-purple-900">{{ posts_this_month }}</p>
+                <p class="text-purple-600 text-sm mt-1">本月新增的文章数量</p>
+            </div>
+
+            <!-- 总评论数卡片 -->
+            <div class="bg-gradient-to-br from-green-50 to-green-100 p-5 rounded-lg shadow-sm border border-green-200">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-green-800 font-medium">总评论数</h3>
+                    <span class="text-green-600">💬</span>
+                </div>
+                <p class="text-3xl font-bold text-green-900">{{ total_comments }}</p>
+                <p class="text-green-600 text-sm mt-1">所有文章的评论总数</p>
+            </div>
+
+            <!-- 分类数量卡片 -->
+            <div class="bg-gradient-to-br from-amber-50 to-amber-100 p-5 rounded-lg shadow-sm border border-amber-200">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-amber-800 font-medium">分类数量</h3>
+                    <span class="text-amber-600">📚</span>
+                </div>
+                <p class="text-3xl font-bold text-amber-900">{{ total_categories }}</p>
+                <p class="text-amber-600 text-sm mt-1">所有文章的分类总数</p>
+            </div>
+
+            <!-- 总浏览量(PV)卡片 -->
+            <div class="bg-gradient-to-br from-red-50 to-red-100 p-5 rounded-lg shadow-sm border border-red-200">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-red-800 font-medium">总浏览量</h3>
+                    <span class="text-red-600">👁️</span>
+                </div>
+                <p class="text-3xl font-bold text-red-900">{{ total_pv }}</p>
+                <p class="text-red-600 text-sm mt-1">网站总访问量统计</p>
+            </div>
+
+            <!-- 独立访客(UV)卡片 -->
+            <div class="bg-gradient-to-br from-teal-50 to-teal-100 p-5 rounded-lg shadow-sm border border-teal-200">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="text-teal-800 font-medium">独立访客</h3>
+                    <span class="text-teal-600">👥</span>
+                </div>
+                <p class="text-3xl font-bold text-teal-900">{{ total_uv }}</p>
+                <p class="text-teal-600 text-sm mt-1">独立访问用户数量</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 访问统计图表 -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800">访问统计趋势</h2>
+        <div class="h-80">
+            <canvas id="visitorsChart"></canvas>
+        </div>
+    </div>
+
+    <!-- 最近文章列表 -->
+    <div class="bg-white rounded-xl shadow-sm p-6">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-gray-800">最近文章</h2>
+            <a href="{{ url_for('new_post') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition duration-300 ease-in-out">
                 新建文章
             </a>
         </div>
-
-        <!-- 统计信息 -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <div class="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-500/10 text-blue-500 rounded-full flex items-center justify-center">
-                        <i class="fa fa-file-text-o"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm text-blue-600">总文章数</p>
-                        <p class="text-2xl font-bold text-blue-800">{{ posts|length }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-green-50 p-4 rounded-lg border border-green-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center">
-                        <i class="fa fa-calendar"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm text-green-600">本月发布</p>
-                        <p class="text-2xl font-bold text-green-800">
-                            {{ posts|selectattr('created_at', '>', now().replace(day=1, hour=0, minute=0, second=0, microsecond=0))|list|length }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-purple-50 p-4 rounded-lg border border-purple-100">
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-purple-500/10 text-purple-500 rounded-full flex items-center justify-center">
-                        <i class="fa fa-comment-o"></i>
-                    </div>
-                    <div>
-                        <p class="text-sm text-purple-600">总评论数</p>
-                        <p class="text-2xl font-bold text-purple-800">
-                            {{ posts|sum(attribute='comments|length', start=0) }}
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 文章列表 -->
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
-                <thead>
+                <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            标题
-                        </th>
-                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            分类
-                        </th>
-                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            作者
-                        </th>
-                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            创建时间
-                        </th>
-                        <th class="px-4 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            评论数
-                        </th>
-                        <th class="px-4 py-3 bg-gray-50 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            操作
-                        </th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">标题</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">分类</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">发布日期</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    {% for post in posts %}
-                        <tr class="hover:bg-gray-50 transition-custom">
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="font-medium text-gray-900 line-clamp-1">
-                                    <a href="{{ url_for('post_detail', slug=post.slug) }}" target="_blank" class="hover:text-primary">
-                                        {{ post.title }}
-                                    </a>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <span class="inline-flex px-2 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary">
-                                    {{ post.category or '未分类' }}
+                    {% for post in posts %}    
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ post.title }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ post.category }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ post.created_at.strftime('%Y-%m-%d') }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                    已发布
                                 </span>
                             </td>
-                            <td class="px-4 py-3 whitespace-nowrap">
-                                <div class="flex items-center">
-                                    <img 
-                                        src="https://picsum.photos/id/{{ post.author_id + 50 }}/100/100" 
-                                        alt="{{ post.author.username }}"
-                                        class="w-6 h-6 rounded-full mr-2"
-                                    >
-                                    <span class="text-sm text-gray-700">{{ post.author.username }}</span>
-                                </div>
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                                {{ post.created_at.strftime('%Y-%m-%d') }}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                                {{ post.comments|length }}
-                            </td>
-                            <td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium">
-                                <div class="flex justify-end gap-2">
-                                    <a href="{{ url_for('admin.edit_post', post_id=post.id) }}" class="text-blue-600 hover:text-blue-800 transition-custom">
-                                        <i class="fa fa-pencil"></i> 编辑
-                                    </a>
-                                    <form method="POST" action="{{ url_for('admin.delete_post', post_id=post.id) }}" onsubmit="return confirmDelete('确定要删除这篇文章吗？删除后将无法恢复。')">
-                                        <button type="submit" class="text-red-600 hover:text-red-800 transition-custom">
-                                            <i class="fa fa-trash"></i> 删除
-                                        </button>
-                                    </form>
-                                </div>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <a href="{{ url_for('edit_post', post_id=post.id) }}" class="text-blue-600 hover:text-blue-900">编辑</a>
+                                <span class="mx-2">|</span>
+                                <a href="#" class="text-red-600 hover:text-red-900 delete-btn" data-id="{{ post.id }}">删除</a>
                             </td>
                         </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                                <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-100 text-gray-400 rounded-full mb-4">
-                                    <i class="fa fa-file-text-o text-2xl"></i>
-                                </div>
-                                <p>暂无文章</p>
-                                <a href="{{ url_for('admin.new_post') }}" class="inline-block mt-2 text-primary hover:underline">
-                                    立即创建第一篇文章
-                                </a>
-                            </td>
-                        </tr>
-                    {% endfor %}
+                    {% endfor %}    
                 </tbody>
             </table>
         </div>
     </div>
+{% endblock %}
+
+{% block extra_js %}
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 获取图表上下文
+            const ctx = document.getElementById('visitorsChart').getContext('2d');
+            
+            // 创建图表
+            const visitorsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ date_list|tojson }},
+                    datasets: [
+                        {
+                            label: '页面访问量(PV)',
+                            data: {{ pv_data|tojson }},
+                            borderColor: '#ef4444',
+                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        },
+                        {
+                            label: '独立访客(UV)',
+                            data: {{ uv_data|tojson }},
+                            borderColor: '#14b8a6',
+                            backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                            tension: 0.3,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Delete post functionality
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const postId = this.getAttribute('data-id');
+                const postTitle = this.closest('tr').querySelector('td:first-child').textContent;
+                
+                if (confirm(`确定要删除文章 "${postTitle}" 吗？此操作不可撤销。`)) {
+                    // Create a form for POST submission
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = `{{ url_for('delete_post', post_id=0) }}`.replace('/0', `/${postId}`);
+                    
+                    // Add CSRF token
+                    const csrfInput = document.createElement('input');
+                    csrfInput.type = 'hidden';
+                    csrfInput.name = 'csrf_token';
+                    csrfInput.value = '{{ request.cookies.get('csrf_token') }}';
+                    form.appendChild(csrfInput);
+                    
+                    // Submit the form
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            });
+        });
+    </script>
 {% endblock %}

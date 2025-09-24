@@ -21,8 +21,8 @@
 {% endblock %}
 
 {% block extra_js %}
-    <!-- TinyMCE 富文本编辑器 -->
-    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- TinyMCE 富文本编辑器 (使用开源版本，无需API密钥) -->
+    <script src="https://cdn.jsdelivr.net/npm/tinymce@6.7.0/tinymce.min.js"></script>
     <script>
         tinymce.init({
             selector: '#content',
@@ -89,7 +89,7 @@
             
             <!-- 操作按钮 -->
             <div class="flex justify-end gap-4 pt-4 border-t border-gray-200">
-                <a href="{{ url_for('admin.dashboard') }}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-custom">
+                <a href="{{ url_for('admin_dashboard') }}" class="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-custom">
                     取消
                 </a>
                 <button type="submit" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-custom font-medium">
